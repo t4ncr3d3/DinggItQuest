@@ -1,13 +1,47 @@
 
-define(function() {
+define(['lib/dinggit', 'connect'], function() {
 
     var Storage = Class.extend({
         init: function() {
-            if(this.hasLocalStorage() && localStorage.data) {
-                this.data = JSON.parse(localStorage.data);
-            } else {
-                this.resetData();
-            }
+
+            this.resetData();
+            this.connected = false;
+
+            var store = this;
+
+            DI.login(function(response) {        
+                if (response.status == 'connected') {          
+                    DI.api('/action/load_player/run', function(response) {  
+                        if( response.status == 'success' && response.data.status == 'success'){
+                            
+                            //load player info
+                            store.isConnected = true;
+                            store.data = response.data;
+                            store.fireInitHandlers();
+                        }   
+                    });        
+                }      
+            }, {        
+                'display': 'popup'      
+            });
+
+
+            // if(this.hasLocalStorage() && localStorage.data) {
+            //     this.data = JSON.parse(localStorage.data);
+            // } else {
+            //     this.resetData();
+            // }
+        },
+
+        onInitHandlers: [],
+        onInit: function(handler){
+            this.onInitHandlers.push(handler);
+        },
+
+        fireInitHandlers: function(){
+            for (var i = 0; i < this.onInitHandlers.length; i++) {
+                this.onInitHandlers[i]();
+            };
         },
 
         resetData: function() {
@@ -31,8 +65,12 @@ define(function() {
             };
         },
 
-        hasLocalStorage: function() {
-            return Modernizr.localstorage;
+        // hasLocalStorage: function() {
+        //     return Modernizr.localstorage;
+        // },
+
+        isConnected: function(){
+            return this.isConnected;
         },
 
         save: function() {

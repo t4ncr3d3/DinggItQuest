@@ -162,13 +162,15 @@ define(['jquery', 'app', 'entrypoint'], function($, App, EntryPoint) {
                return false;
             });
 
-            var data = app.storage.data;
-            if(data.hasAlreadyPlayed) {
-                if(data.player.name && data.player.name !== "") {
-                    $('#playername').html(data.player.name);
-                    $('#playerimage').attr('src', data.player.image);
+            app.storage.onInit(function(){
+                var data = app.storage.data;
+                if(data.hasAlreadyPlayed) {
+                    if(data.player.name && data.player.name !== "") {
+                        $('#playername').html(data.player.name);
+                        $('#playerimage').attr('src', data.player.image);
+                    }
                 }
-            }
+            });
 
             $('.play div').click(function(event) {
                 var nameFromInput = $('#nameinput').attr('value'),
