@@ -9,7 +9,7 @@ define(['lib/dinggit', 'connect'], function() {
             // this.playerLoaded = false;
             // this.store = this;
 
-            if(DI._userStatus == 'connected'){
+            if(DI.getLoginStatus() == 'connected'){
                 log.debug("Storage connected.");
                 this.loadPlayer();
             }
