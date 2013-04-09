@@ -3,6 +3,7 @@ define(['jquery', 'storage'], function($, Storage) {
 
     var App = Class.extend({
         init: function() {
+            var self = this;
             this.currentPage = 1;
             this.blinkInterval = null;
             this.isParchmentReady = true;
@@ -11,11 +12,30 @@ define(['jquery', 'storage'], function($, Storage) {
             this.watchNameInputInterval = setInterval(this.toggleButton.bind(this), 100);
             this.$playButton = $('.play'),
             this.$playDiv = $('.play div');
-            this.frontPage = 'createcharacter';
 
-            if(localStorage && localStorage.data) {
-                this.frontPage = 'loadcharacter';
+            if( this.storage.isPlayerLoaded()){
+                this.frontPage = 'connected';
+
+                this.$playerName = $('#playername');
+                this.$playerImage = $('playerimage');
+
+                this.storage.onLoadPlayer(function(){
+                    var data = app.storage.data;
+                    if(data.hasAlreadyPlayed) {
+                        if(data.player.name && data.player.name !== "") {
+                            self.$playerName.html(data.player.name);
+                            self.$playerImage.attr('src', data.player.image);
+                        }
+                    }
+                });
+
+            }else{
+                this.frontPage = 'not-connected';
             }
+
+            // if(localStorage && localStorage.data) {
+            //     this.frontPage = 'loadcharacter';
+            // }
         },
 
         setGame: function(game) {
@@ -32,6 +52,10 @@ define(['jquery', 'storage'], function($, Storage) {
         },
 
         canStartGame: function() {
+            if( !this.storage.isPlayerLoaded()){
+                return false;
+            }
+
             if(this.isDesktop) {
                 return (this.game && this.game.map && this.game.map.isLoaded);
             } else {
@@ -42,6 +66,10 @@ define(['jquery', 'storage'], function($, Storage) {
         tryStartingGame: function(username, starting_callback) {
             var self = this,
                 $play = this.$playButton;
+
+            if(!this.storage.isPlayerLoaded()){
+                this.storage.login();
+            }
 
             if(username !== '') {
                 if(!this.ready || !this.canStartGame()) {

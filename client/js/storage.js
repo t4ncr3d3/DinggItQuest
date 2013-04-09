@@ -1,30 +1,18 @@
 
 define(['lib/dinggit', 'connect'], function() {
 
+    // store: null;
     var Storage = Class.extend({
         init: function() {
 
             this.resetData();
-            this.connected = false;
+            // this.playerLoaded = false;
+            // this.store = this;
 
-            var store = this;
-
-            DI.login(function(response) {        
-                if (response.status == 'connected') {          
-                    DI.api('/action/load_player/run', function(response) {  
-                        if( response.status == 'success' && response.data.status == 'success'){
-                            
-                            //load player info
-                            store.isConnected = true;
-                            store.data = response.data;
-                            store.fireInitHandlers();
-                        }   
-                    });        
-                }      
-            }, {        
-                'display': 'popup'      
-            });
-
+            if(DI._userStatus == 'connected'){
+                log.debug("Storage connected.");
+                this.loadPlayer();
+            }
 
             // if(this.hasLocalStorage() && localStorage.data) {
             //     this.data = JSON.parse(localStorage.data);
@@ -33,18 +21,46 @@ define(['lib/dinggit', 'connect'], function() {
             // }
         },
 
-        onInitHandlers: [],
-        onInit: function(handler){
-            this.onInitHandlers.push(handler);
+        login: function(){
+            var self = this;
+            DI.login(function(response) {        
+                if (response.status == 'connected') {  
+                    self.loadPlayer();
+                    log.debug("Storage connected.");
+                }      
+            }, {        
+                'display': 'popup'      
+            });
         },
 
-        fireInitHandlers: function(){
-            for (var i = 0; i < this.onInitHandlers.length; i++) {
-                this.onInitHandlers[i]();
-            };
+        loadPlayer: function(){
+            log.debug("Loading player...");
+            var self = this;
+            DI.api('/action/load_player/run', function(response) {  
+                if( response.status == 'success' && response.data.status == 'success'){
+                    
+                    //load player info
+                    self.data = response.data;
+                    self.playerLoaded = true;        
+                    log.debug("Player loaded.");
+                    // self.fireLoadPlayerHandlers();
+                }   
+            });
         },
+
+        // onLoadPlayerHandlers: [],
+        // onLoadPlayer: function(handler){
+        //     this.onLoadPlayerHandlers.push(handler);
+        // },
+
+        // fireLoadPlayerHandlers: function(){
+        //     for (var i = 0; i < this.onLoadPlayerHandlers.length; i++) {
+        //         this.onLoadPlayerHandlers[i]();
+        //     };
+        // },
 
         resetData: function() {
+            this.playerLoaded = false;
             this.data = {
                 hasAlreadyPlayed: false,
                 player: {
@@ -69,8 +85,8 @@ define(['lib/dinggit', 'connect'], function() {
         //     return Modernizr.localstorage;
         // },
 
-        isConnected: function(){
-            return this.isConnected;
+        isPlayerLoaded: function(){
+            return this.playerLoaded;
         },
 
         save: function() {

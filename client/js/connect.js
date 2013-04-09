@@ -21,10 +21,23 @@
 define(['lib/dinggit'], function() {
 
     DI.init({
-        apiKey: 'ae4e625855cf4613b125b7c0d805da3d', 
+        apiKey: '6f262109d5a3451d8513dcf2cd54e452', 
         status: true,
         cookie: true,
         logging: true
+    });
+
+    /* All the events registered */
+    DI.Event.subscribe('auth.login', function(response) {
+        console.log("auth login"); 
+    });
+
+    DI.Event.subscribe('auth.statusChange', function(response) {
+        console.log("status change");
+    });
+
+    DI.Event.subscribe('auth.sessionChange', function(response) {
+       console.log("session change"); 
     });
 
 });

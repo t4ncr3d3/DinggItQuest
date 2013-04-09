@@ -57,6 +57,7 @@ Mozilla presents an HTML5 mini-MMORPG by Little Workshop http://www.littleworksh
 	<body class="intro upscaled">
     <![endif]-->
 	<body class="intro">
+        <div id="di-root"></div>
 	    <noscript>
 	       <div class="alert">
 	           You need to enable JavaScript to play BrowserQuest.
@@ -75,36 +76,29 @@ Mozilla presents an HTML5 mini-MMORPG by Little Workshop http://www.littleworksh
 	            </p>
 	            <div id="tilt"></div>
 	        </article>
-	        <section id="parchment" class="createcharacter">
+	        <section id="parchment" class="not-connected">
 	            <div class="parchment-left"></div>
 	            <div class="parchment-middle">
-                    <article id="createcharacter">
+                    <article id="not-connected">
           	           <h1>
           	               <span class="left-ornament"></span>
-          	               A Massively Multiplayer Adventure
+          	               A Massively Multiplayer Adventure (not connected)
           	               <span class="right-ornament"></span>
                          </h1>
-                         <div id="character" class="disabled">
-                             <div></div>
-                         </div>
-                         <form action="none" method="get" accept-charset="utf-8">
-                             <label id="name-tooltip" for="player">Try to think of a cool nickname!</label>
-                             <input type="text" id="nameinput" class="stroke" name="player-name" placeholder="Name your character" maxlength="15" autofocus>
-                         </form>
-                         <div class="play button disabled">
-                             <div></div>
-                             <img src="img/common/spinner.gif" alt="">
-                         </div>
                          <div class="ribbon">
                             <div class="top"></div>
                             <div class="bottom"></div>
                          </div>
+                         <div class="play button">
+                             <div></div>
+                             <img src="img/common/spinner.gif" alt="">
+                         </div>
                     </article>
-                    <article id="loadcharacter">
-          	           <h1>
-          	               <span class="left-ornament"></span>
-          	               Load your character
-          	               <span class="right-ornament"></span>
+                    <article id="connected">
+                       <h1>
+                           <span class="left-ornament"></span>
+                           A Massively Multiplayer Adventure (connected)
+                           <span class="right-ornament"></span>
                          </h1>
                          <div class="ribbon">
                             <div class="top"></div>
@@ -116,9 +110,6 @@ Mozilla presents an HTML5 mini-MMORPG by Little Workshop http://www.littleworksh
                          <div class="play button">
                              <div></div>
                              <img src="img/common/spinner.gif" alt="">
-                         </div>
-                         <div id="create-new">
-                            <span><span>or</span> reset your character</span>
                          </div>
                     </article>
                     <article id="confirmation">
@@ -224,7 +215,7 @@ Mozilla presents an HTML5 mini-MMORPG by Little Workshop http://www.littleworksh
           	               <span class="right-ornament"></span>
                          </h1>
                          <p>
-                             BrowserQuest stores your character name, game achievements and equipment in your browser and does not send them to Mozilla. We do collect server log data (such as IP address) as well as web analytics data. We handle info we receive about you as explained in our <a class="clickable" target="_blank" href="http://www.mozilla.org/en-US/privacy-policy">Privacy Policy</a>.
+                             BrowserQuest stores your character name, game achievements and equipment in the DinggIt platform. We do collect server log data (such as IP address) as well as web analytics data. We handle info we receive about you as explained in our <a class="clickable" target="_blank" href="http://www.mozilla.org/en-US/privacy-policy">Privacy Policy</a>.
                          </p>
  	                    <div id="close-legal">
  	                        <span>- click anywhere to close -</span>
@@ -375,18 +366,19 @@ Mozilla presents an HTML5 mini-MMORPG by Little Workshop http://www.littleworksh
                 document.querySelector('body').className += ' upscaled';
             }
             
-            if(!Modernizr.localstorage) {
-                var alert = document.createElement("div");
-                    alert.className = 'alert';
-                var alertMsg = document.createTextNode("You need to enable cookies/localStorage to play BrowserQuest");
-                    alert.appendChild(alertMsg);
+            // if(!Modernizr.localstorage) {
+            //     var alert = document.createElement("div");
+            //         alert.className = 'alert';
+            //     var alertMsg = document.createTextNode("You need to enable cookies/localStorage to play BrowserQuest");
+            //         alert.appendChild(alertMsg);
 
-                target = document.getElementById("intro");
-                document.body.insertBefore(alert, target);
-            } else if(localStorage && localStorage.data) {
-                document.body.className += " returning";
-                parchment.className = "loadcharacter";
-            }
+            //     target = document.getElementById("intro");
+            //     document.body.insertBefore(alert, target);
+            // } 
+            // else if(localStorage && localStorage.data) {
+            //     document.body.className += " returning";
+            //     parchment.className = "loadcharacter";
+            // }
         </script>
         
         <script src="js/lib/log.js"></script>

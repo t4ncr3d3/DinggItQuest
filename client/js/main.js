@@ -7,6 +7,11 @@ define(['jquery', 'app', 'entrypoint'], function($, App, EntryPoint) {
             app = new App();
             app.center();
 
+            if(app.storage.isPlayerLoaded()) {
+                document.body.className += " returning";
+                parchment.className = "connected";
+            }
+
             if(Detect.isWindows()) {
                 // Workaround for graphical glitches on text
                 $('body').addClass('windows');
@@ -96,27 +101,27 @@ define(['jquery', 'app', 'entrypoint'], function($, App, EntryPoint) {
                 };
             });
 
-            $('#create-new span').click(function() {
-                app.animateParchment('loadcharacter', 'confirmation');
-            });
+            // $('#create-new span').click(function() {
+            //     app.animateParchment('loadcharacter', 'confirmation');
+            // });
 
-            $('.delete').click(function() {
-                app.storage.clear();
-                app.animateParchment('confirmation', 'createcharacter');
-                $('body').removeClass('returning');
-            });
+            // $('.delete').click(function() {
+            //     app.storage.clear();
+            //     app.animateParchment('confirmation', 'createcharacter');
+            //     $('body').removeClass('returning');
+            // });
 
-            $('#cancel span').click(function() {
-                app.animateParchment('confirmation', 'loadcharacter');
-            });
+            // $('#cancel span').click(function() {
+            //     app.animateParchment('confirmation', 'loadcharacter');
+            // });
 
             $('.ribbon').click(function() {
                 app.toggleScrollContent('about');
             });
 
-            $('#nameinput').bind("keyup", function() {
-                app.toggleButton();
-            });
+            // $('#nameinput').bind("keyup", function() {
+            //     app.toggleButton();
+            // });
 
             $('#previous').click(function() {
                 var $achievements = $('#achievements');
@@ -162,22 +167,33 @@ define(['jquery', 'app', 'entrypoint'], function($, App, EntryPoint) {
                return false;
             });
 
-            app.storage.onInit(function(){
-                var data = app.storage.data;
-                if(data.hasAlreadyPlayed) {
-                    if(data.player.name && data.player.name !== "") {
-                        $('#playername').html(data.player.name);
-                        $('#playerimage').attr('src', data.player.image);
-                    }
-                }
-            });
+            // app.storage.onLoadPlayer(function(){
+            //     var data = app.storage.data;
+            //     if(data.hasAlreadyPlayed) {
+            //         if(data.player.name && data.player.name !== "") {
+            //             $('#playername').html(data.player.name);
+            //             $('#playerimage').attr('src', data.player.image);
+            //         }
+            //     }
+            // });
 
             $('.play div').click(function(event) {
-                var nameFromInput = $('#nameinput').attr('value'),
-                    nameFromStorage = $('#playername').html(),
-                    name = nameFromInput || nameFromStorage;
+                // var nameFromInput = $('#nameinput').attr('value'),
+                var    name = $('#playername').html();
+                    // name = nameFromInput || nameFromStorage;
+
+                // DI.Event.subscribe('auth.login', function(response) {
+                //     app.tryStartingGame(name);
+                // });
 
                 app.tryStartingGame(name);
+                
+                // app.login(function(){
+                //     app.loadPlayer(function(){
+                //         app.tryStartingGame(name);
+                //     });
+                // });
+                
             });
 
             document.addEventListener("touchstart", function() {},false);
@@ -285,7 +301,7 @@ define(['jquery', 'app', 'entrypoint'], function($, App, EntryPoint) {
 
             app.initHealthBar();
 
-            $('#nameinput').attr('value', '');
+            // $('#nameinput').attr('value', '');
             $('#chatbox').attr('value', '');
 
             if(game.renderer.mobile || game.renderer.tablet) {
@@ -496,31 +512,31 @@ define(['jquery', 'app', 'entrypoint'], function($, App, EntryPoint) {
                 }
             });
 
-            $('#nameinput').focusin(function() {
-                $('#name-tooltip').addClass('visible');
-            });
+            // $('#nameinput').focusin(function() {
+            //     $('#name-tooltip').addClass('visible');
+            // });
 
-            $('#nameinput').focusout(function() {
-                $('#name-tooltip').removeClass('visible');
-            });
+            // $('#nameinput').focusout(function() {
+            //     $('#name-tooltip').removeClass('visible');
+            // });
 
-            $('#nameinput').keypress(function(event) {
-                var $name = $('#nameinput'),
-                    name = $name.attr('value');
+            // $('#nameinput').keypress(function(event) {
+            //     var $name = $('#nameinput'),
+            //         name = $name.attr('value');
 
-                $('#name-tooltip').removeClass('visible');
+            //     $('#name-tooltip').removeClass('visible');
 
-                if(event.keyCode === 13) {
-                    if(name !== '') {
-                        app.tryStartingGame(name, function() {
-                            $name.blur(); // exit keyboard on mobile
-                        });
-                        return false; // prevent form submit
-                    } else {
-                        return false; // prevent form submit
-                    }
-                }
-            });
+            //     if(event.keyCode === 13) {
+            //         if(name !== '') {
+            //             app.tryStartingGame(name, function() {
+            //                 $name.blur(); // exit keyboard on mobile
+            //             });
+            //             return false; // prevent form submit
+            //         } else {
+            //             return false; // prevent form submit
+            //         }
+            //     }
+            // });
 
             $('#mutebutton').click(function() {
                 game.audioManager.toggle();
@@ -530,7 +546,7 @@ define(['jquery', 'app', 'entrypoint'], function($, App, EntryPoint) {
                 var key = e.which,
                     $chat = $('#chatinput');
 
-                if($('#chatinput:focus').size() == 0 && $('#nameinput:focus').size() == 0) {
+                if($('#chatinput:focus').size() == 0 ) {
                     if(key === 13) { // Enter
                         if(game.ready) {
                             $chat.focus();
