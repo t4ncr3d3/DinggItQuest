@@ -1,63 +1,85 @@
 
-define(['lib/dinggit', 'connect'], function() {
+define(['lib/dinggit'], function() {
 
-    // store: null;
     var Storage = Class.extend({
         init: function() {
-
             this.resetData();
-            // this.playerLoaded = false;
-            // this.store = this;
-
-            if(DI.getLoginStatus() == 'connected'){
-                log.debug("Storage connected.");
-                this.loadPlayer();
-            }
-
-            // if(this.hasLocalStorage() && localStorage.data) {
-            //     this.data = JSON.parse(localStorage.data);
-            // } else {
-            //     this.resetData();
-            // }
+            this.initConnection();
         },
 
-        login: function(){
+        initConnection: function(){
+            DI.init({
+                apiKey: '6f262109d5a3451d8513dcf2cd54e452', 
+                status: true,
+                cookie: true,
+                logging: true
+            });
+        },
+
+        onLogin: function(fn){
+            DI.Event.subscribe('auth.login', function(response) {
+                console.log("auth login"); 
+                if(fn) fn();
+            });
+        },
+
+        onStatusChange: function(fn){
+            DI.Event.subscribe('auth.statusChange', function(response) {
+                console.log("status change");
+                if(fn) fn();
+            });
+        },
+
+        onSessionChange: function(fn){
+            DI.Event.subscribe('auth.sessionChange', function(response) {
+               console.log("session change"); 
+               if(fn) fn();
+            });
+        },
+
+        getPlayerStatus: function(fn){
             var self = this;
+            log.debug("Testing connection to DinggIt...");
+            DI.getLoginStatus(function(response) {  
+                if (response.status === 'connected') {     
+                    log.debug("Connected to DinggIt."); 
+                    // self.loadPlayer(); 
+                    if(fn) fn(); 
+                } else {
+                    log.debug("Not connected to DinggIt! Response status: " + response.status);
+                }
+            });
+        },
+
+        connectPlayer: function(){
+            var self = this;
+            log.debug("Connecting to DinggIt...");
             DI.login(function(response) {        
                 if (response.status == 'connected') {  
+                    log.debug("Connected to DinggIt.");
                     self.loadPlayer();
-                    log.debug("Storage connected.");
-                }      
+                }else{
+                    log.debug("Connection to DinggIt failed! Response status: " + response.status);
+                }
             }, {        
                 'display': 'popup'      
             });
         },
 
-        loadPlayer: function(){
-            log.debug("Loading player...");
+        loadPlayer: function(fn){
             var self = this;
+            log.debug("Loading player...");
             DI.api('/action/load_player/run', function(response) {  
                 if( response.status == 'success' && response.data.status == 'success'){
-                    
-                    //load player info
-                    self.data = response.data;
+                    self.importData( response.data);
                     self.playerLoaded = true;        
                     log.debug("Player loaded.");
-                    // self.fireLoadPlayerHandlers();
-                }   
+                    if(fn) fn();
+                }else{
+                    log.debug("Loading player failed! Response status: " + response.status);
+                } 
             });
         },
-
-        // onLoadPlayerHandlers: [],
-        // onLoadPlayer: function(handler){
-        //     this.onLoadPlayerHandlers.push(handler);
-        // },
-
-        // fireLoadPlayerHandlers: function(){
-        //     for (var i = 0; i < this.onLoadPlayerHandlers.length; i++) {
-        //         this.onLoadPlayerHandlers[i]();
-        //     };
-        // },
 
         resetData: function() {
             this.playerLoaded = false;
@@ -81,28 +103,107 @@ define(['lib/dinggit', 'connect'], function() {
             };
         },
 
-        // hasLocalStorage: function() {
-        //     return Modernizr.localstorage;
-        // },
+        importData: function( dinggItData){
+            var self = this;
+            this.data = {
+                hasAlreadyPlayed: false || dinggItData.player.dynProp.hasAlreadyPlayed,
+                player: {
+                    name: "" || dinggItData.player.name || dinggItData.player.dynProp.name,
+                    weapon: "" || dinggItData.player.dynProp.weapon,
+                    armor: "" || dinggItData.player.dynProp.armor,
+                    guild: "" || dinggItData.player.dynProp.guild,
+                    image: "" || dinggItData.player.dynProp.image
+                },
+                achievements: {
+                    unlocked: [],
+                    ratCount: 0,
+                    skeletonCount: 0,
+                    totalKills: 0,
+                    totalDmg: 0,
+                    totalRevives: 0
+                }
+            };
+
+            _.each(dinggItData.achievements, function(element, index, list){
+                if(element.dynProp.unlocked == true){
+                    self.data.achievements.unlocked.push(parseInt(element.ref));
+                }
+
+                switch(element.ref){
+                    case "3":
+                        self.data.achievements.ratCount = element.dynProp.progression;
+                    break;
+                    case "10":
+                        self.data.achievements.skeletonCount = element.dynProp.progression;
+                    break;
+                    case "13":
+                        self.data.achievements.totalKills = element.dynProp.progression;
+                    break;
+                    case "14":
+                        self.data.achievements.totalRevives = element.dynProp.progression;
+                    break;
+                    case "15":
+                        self.data.achievements.totalDmg = element.dynProp.progression;
+                    break;
+                }
+            });
+        },
+
+        exportData: function(){
+            var self = this;
+
+            var data = {
+                hasAlreadyPlayed: self.data.hasAlreadyPlayed,
+                name: self.data.player.name,
+                weapon: self.data.player.weapon,
+                armor: self.data.player.armor,
+                guild: self.data.player.guild,
+                image: self.data.player.image,
+                p3: self.data.achievements.ratCount,
+                p10: self.data.achievements.skeletonCount,
+                p13: self.data.achievements.totalKills,
+                p14: self.data.achievements.totalRevives,
+                p15: self.data.achievements.totalDmg
+                
+            };
+
+            _.each( [1, 2, 4, 5, 6, 7, 8, 9, 11, 12, 16, 17, 18, 19, 20], function(element, index, list){
+                if(_.contains( self.data.achievements.unlocked, element)){
+                    data["p" + element] = 1;
+                }else{
+                    data["p" + element] = 0;
+                }
+            });
+            
+            return data;
+        },
+
+        save: function() {
+            var req = this.exportData();
+            log.debug("Saving player");
+            DI.api('/action/save_player/run', 
+                'POST', 
+                req,
+                function(response) {
+                    if (response.status == 'success' && response.data.status == 'success') {
+                        log.debug("Player saved.");
+                    } else {
+                        log.debug("Saving player failed! Response status: " + response.status);
+                    }
+                }
+            );
+        },
+
+        clear: function() {
+            this.resetData();
+            this.save();
+        },
+
+        // Player
 
         isPlayerLoaded: function(){
             return this.playerLoaded;
         },
-
-        save: function() {
-            if(this.hasLocalStorage()) {
-                localStorage.data = JSON.stringify(this.data);
-            }
-        },
-
-        clear: function() {
-            if(this.hasLocalStorage()) {
-                localStorage.data = "";
-                this.resetData();
-            }
-        },
-
-        // Player
 
         hasAlreadyPlayed: function() {
             return this.data.hasAlreadyPlayed;

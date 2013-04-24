@@ -13,29 +13,32 @@ define(['jquery', 'storage'], function($, Storage) {
             this.$playButton = $('.play'),
             this.$playDiv = $('.play div');
 
-            if( this.storage.isPlayerLoaded()){
-                this.frontPage = 'connected';
+            this.frontPage = 'not-connected';
+            this.storage.getPlayerStatus(function(){
+                self.storage.loadPlayer(function(){
+                    if( self.storage.isPlayerLoaded()){
+                        self.frontPage = 'connected';
 
-                this.$playerName = $('#playername');
-                this.$playerImage = $('playerimage');
+                        self.$body = $('body');
+                        self.$body[0].className += " returning";
 
-                this.storage.onLoadPlayer(function(){
-                    var data = app.storage.data;
-                    if(data.hasAlreadyPlayed) {
+                        self.$parchment = $('#parchment');
+                        self.$parchment[0].className = "connected";
+
+                        self.$playerName = $('#playername');
+                        self.$playerImage = $('#playerimage');
+
+                        var data = self.storage.data;
                         if(data.player.name && data.player.name !== "") {
                             self.$playerName.html(data.player.name);
+                            
+                        }
+                        if(data.player.image && data.player.image !== ""){
                             self.$playerImage.attr('src', data.player.image);
                         }
                     }
-                });
-
-            }else{
-                this.frontPage = 'not-connected';
-            }
-
-            // if(localStorage && localStorage.data) {
-            //     this.frontPage = 'loadcharacter';
-            // }
+                })
+            });
         },
 
         setGame: function(game) {
@@ -68,7 +71,7 @@ define(['jquery', 'storage'], function($, Storage) {
                 $play = this.$playButton;
 
             if(!this.storage.isPlayerLoaded()){
-                this.storage.login();
+                this.storage.connectPlayer();
             }
 
             if(username !== '') {
