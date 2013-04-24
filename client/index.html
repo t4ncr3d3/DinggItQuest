@@ -57,13 +57,12 @@ Mozilla presents an HTML5 mini-MMORPG by Little Workshop http://www.littleworksh
 	<body class="intro upscaled">
     <![endif]-->
 	<body class="intro">
-        <div id="di-root"></div>
+        <div id="diroot"></div>
 	    <noscript>
 	       <div class="alert">
 	           You need to enable JavaScript to play BrowserQuest.
 	       </div>
 	    </noscript>
-	    <a id="moztab" class="clickable" target="_blank" href="http://www.mozilla.org/"></a>
 	    <div id="intro">
 	        <h1 id="logo">
 	           <span id="logosparks">
@@ -82,7 +81,7 @@ Mozilla presents an HTML5 mini-MMORPG by Little Workshop http://www.littleworksh
                     <article id="not-connected">
           	           <h1>
           	               <span class="left-ornament"></span>
-          	               A Massively Multiplayer Adventure (not connected)
+          	               A Massively Multiplayer Adventure
           	               <span class="right-ornament"></span>
                          </h1>
                          <div class="ribbon">
@@ -97,7 +96,7 @@ Mozilla presents an HTML5 mini-MMORPG by Little Workshop http://www.littleworksh
                     <article id="connected">
                        <h1>
                            <span class="left-ornament"></span>
-                           A Massively Multiplayer Adventure (connected)
+                           A Massively Multiplayer Adventure
                            <span class="right-ornament"></span>
                          </h1>
                          <div class="ribbon">
@@ -365,20 +364,6 @@ Mozilla presents an HTML5 mini-MMORPG by Little Workshop http://www.littleworksh
             if(ctx.mozImageSmoothingEnabled === undefined) {
                 document.querySelector('body').className += ' upscaled';
             }
-            
-            // if(!Modernizr.localstorage) {
-            //     var alert = document.createElement("div");
-            //         alert.className = 'alert';
-            //     var alertMsg = document.createTextNode("You need to enable cookies/localStorage to play BrowserQuest");
-            //         alert.appendChild(alertMsg);
-
-            //     target = document.getElementById("intro");
-            //     document.body.insertBefore(alert, target);
-            // } 
-            // else if(localStorage && localStorage.data) {
-            //     document.body.className += " returning";
-            //     parchment.className = "loadcharacter";
-            // }
         </script>
         
         <script src="js/lib/log.js"></script>
