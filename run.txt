@@ -1,6 +1,12 @@
 Start app:
 cd /Users/tancrede/IT/Projets/BrowserQuest/workspaces/dinggit
+
+si foreman est installé:
+foreman start
+sinon
 node server/js/main.js
 
-debug (with node-inspector)
-node --debug-brk server/js/main.js
+
+
+(debug (with node-inspector)
+node --debug-brk server/js/main.js)
