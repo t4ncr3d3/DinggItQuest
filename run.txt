@@ -8,5 +8,5 @@ node server/js/main.js
 
 
 
-(debug (with node-inspector)
-node --debug-brk server/js/main.js)
+debug (with node-inspector)
+node --debug-brk server/js/main.js

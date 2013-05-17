@@ -178,7 +178,17 @@ define(['lib/dinggit'], function() {
             return data;
         },
 
-        save: function() {
+        save: function(){
+            if(this.db_save){
+                this.db_save();
+            } else {
+                this.db_save = _.debounce( this._save, 5000, false);
+                this.db_save();
+            }
+        },
+
+        db_save: undefined,
+        _save: function() {
             var req = this.exportData();
             log.debug("Saving player");
             DI.api('/action/save_player/run', 
